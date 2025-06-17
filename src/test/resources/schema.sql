@@ -1,0 +1,2 @@
+-- This file is intentionally empty
+-- We will let Hibernate handle the schema creation for tests based on JPA annotations

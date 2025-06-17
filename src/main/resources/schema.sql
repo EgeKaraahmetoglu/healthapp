@@ -1,0 +1,2 @@
+-- This file is intentionally left empty as we're now using JPA for schema generation.
+-- Schema updates are handled through entity annotations.

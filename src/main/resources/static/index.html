@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HealthApp Admin Dashboard</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .follow-up-btn {
+      font-size: 0.8rem;
+      padding: 0.2rem 0.5rem;
+    }
+    .attachment-item {
+      font-size: 0.9rem;
+      margin-left: 1rem;
+      padding: 0.2rem 0.5rem;
+    }
+    .nested-answer {
+      margin-left: 1.5rem;
+      border-left: 3px solid #ccc;
+      padding-left: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">HealthApp Admin</a>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="doctors-tab" data-bs-toggle="tab" data-bs-target="#doctors" type="button" role="tab">Doctors</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab">Patients</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab">Questions</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="answers-tab" data-bs-toggle="tab" data-bs-target="#answers" type="button" role="tab">Answers</button>
+      </li>
+    </ul>
+    
+    <div class="tab-content pt-3" id="adminTabsContent">
+      <!-- Doctors Tab -->
+      <div class="tab-pane fade show active" id="doctors" role="tabpanel">
+        <h3>Doctors</h3>
+        <form id="doctor-form" class="row g-3 mb-3">
+          <div class="col-md-5">
+            <input type="text" id="doctor-name" class="form-control" placeholder="Name" required>
+          </div>
+          <div class="col-md-5">
+            <input type="text" id="doctor-specialty" class="form-control" placeholder="Specialty" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Add</button>
+          </div>
+        </form>
+        <ul id="doctor-list" class="list-group"></ul>
+      </div>
+      
+      <!-- Patients Tab -->
+      <div class="tab-pane fade" id="patients" role="tabpanel">
+        <h3>Patients</h3>
+        <form id="patient-form" class="row g-3 mb-3">
+          <div class="col-md-6">
+            <input type="text" id="patient-name" class="form-control" placeholder="Name" required>
+          </div>
+          <div class="col-md-6">
+            <input type="email" id="patient-email" class="form-control" placeholder="Email" required>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-success">Add Patient</button>
+          </div>
+        </form>
+        <ul id="patient-list" class="list-group"></ul>
+      </div>
+      
+      <!-- Questions Tab -->
+      <div class="tab-pane fade" id="questions" role="tabpanel">
+        <h3>Questions</h3>
+        <form id="question-form" class="row g-3 mb-3">
+          <div class="col-md-12 mb-2">
+            <textarea id="question-content" class="form-control" placeholder="Question content" required rows="3"></textarea>
+          </div>
+            <div class="col-md-12">
+            <label for="question-patient">Patient</label>
+            <select id="question-patient" class="form-select" required>
+              <option value="">Select Patient</option>
+            </select>
+          </div>
+          
+          <div class="col-md-12 mt-3">
+            <label for="question-file">Attachments (optional)</label>
+            <input type="file" id="question-file" class="form-control" multiple>
+          </div>
+          
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-success">Post Question</button>
+            <div id="question-status" class="mt-2"></div>
+          </div>
+        </form>
+        
+        <hr>
+        <h4>All Questions</h4>
+        <div id="question-list" class="list-group mt-3"></div>
+      </div>
+      
+      <!-- Answers Tab -->
+      <div class="tab-pane fade" id="answers" role="tabpanel">
+        <h3>Answers</h3>
+        <form id="answer-form" class="row g-3 mb-3">
+          <div class="col-md-12 mb-2">
+            <label for="answer-question">Question to Answer</label>
+            <select id="answer-question" class="form-select" required>
+              <option value="">Select Question</option>
+            </select>
+          </div>
+          
+          <div class="col-md-6">
+            <label for="answer-doctor">Answering Doctor</label>
+            <select id="answer-doctor" class="form-select" required>
+              <option value="">Select Doctor</option>
+            </select>
+          </div>
+          
+          <div class="col-md-12 mt-3">
+            <label for="answer-content">Answer Content</label>
+            <textarea id="answer-content" class="form-control" placeholder="Answer content" required rows="3"></textarea>
+          </div>
+          
+          <div class="col-md-12 mt-3">
+            <label for="answer-file">Attachments (optional)</label>
+            <input type="file" id="answer-file" class="form-control" multiple>
+          </div>
+          
+          <div class="col-12 mt-3">
+            <button type="submit" class="btn btn-success">Submit Answer</button>
+            <div id="answer-status" class="mt-2"></div>
+          </div>
+        </form>
+        
+        <hr>
+        <h4>All Answers</h4>
+        <div id="answer-list" class="list-group mt-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS & Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Global state
+    let globalState = {
+      answers: [],
+      questions: [],
+      doctors: [],
+      patients: []
+    };
+
+    // Utility fetch wrappers
+    async function fetchJson(url, options) {
+      try {
+        console.log(`Fetching from ${url}`, options);
+        const res = await fetch(url, options);
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error(`HTTP error ${res.status} for ${url}:`, errorText);
+          throw new Error(errorText || `HTTP error: ${res.status}`);
+        }
+        
+        const data = await res.json();
+        console.log(`Successful response from ${url}:`, data);
+        
+        if (Array.isArray(data)) {
+          console.log(`Received array with ${data.length} items`);
+          // Filter out any null or undefined items in arrays
+          return data.filter(item => item !== null && item !== undefined);
+        }
+        
+        return data;
+      } catch (err) {
+        console.error(`Fetch error for ${url}:`, err);
+        throw err;
+      }
+    }// Upload attachment and return its ID
+    async function uploadAttachment(file) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/attachments/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Upload failed: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        
+        // Make sure we have an ID and log it
+        if (!data || !data.id) {
+          console.error('Missing attachment ID in response:', data);
+          throw new Error('Server returned an invalid attachment response');
+        }
+        
+        console.log('Uploaded file:', file.name, 'Got ID:', data.id);
+        return data.id;
+      } catch (err) {
+        console.error('Error uploading attachment:', err);
+        throw err;
+      }
+    }    // Load data and update UI
+    async function loadData() {
+      try {
+        showStatus('Loading data...', 'question-status', 'info');
+        showStatus('Loading data...', 'answer-status', 'info');
+        
+        // Load doctors
+        globalState.doctors = await fetchJson('/api/doctors');
+        renderDoctors(globalState.doctors);
+        
+        // Load patients
+        globalState.patients = await fetchJson('/api/patients');
+        renderPatients(globalState.patients);
+        
+        // Load questions with nested answers
+        globalState.questions = await fetchJson('/api/questions');
+        console.log("Loaded questions:", globalState.questions);
+        
+        // Debug each question's attachments
+        if (globalState.questions && globalState.questions.length > 0) {
+          globalState.questions.forEach(q => {
+            console.log(`Question #${q.id} has ${q.attachments ? q.attachments.length : 0} attachments`);
+            if (q.attachments && q.attachments.length > 0) {
+              q.attachments.forEach(att => {
+                console.log(`  - Attachment ID: ${att.id}, filename: ${att.fileName || 'unnamed'}`);
+              });
+            }
+          });
+        }
+        
+        renderQuestions(globalState.questions);
+          // Load answers for the answers tab
+        globalState.answers = await fetchJson('/api/answers');
+        
+        // Debug each answer
+        if (globalState.answers && globalState.answers.length > 0) {
+          console.log(`Loaded ${globalState.answers.length} answers from API`);
+          globalState.answers.forEach(a => {
+            console.log(`Answer #${a.id} by doctor ${a.doctor ? a.doctor.name : 'unknown'} for question #${a.question ? a.question.id : 'unknown'}`);
+            console.log(`Answer #${a.id} has ${a.attachments ? a.attachments.length : 0} attachments`);
+            
+            if (a.attachments && a.attachments.length > 0) {
+              a.attachments.forEach(att => {
+                console.log(`  - Answer #${a.id} Attachment ID: ${att.id}, filename: ${att.fileName || 'unnamed'}`);
+              });
+            }
+          });
+        } else {
+          console.log("No answers loaded from API");
+        }
+        
+        renderAnswers(globalState.answers);
+        
+        clearStatus('question-status');
+        clearStatus('answer-status');
+        
+        console.log("Data loaded successfully", globalState);
+      } catch (error) {
+        console.error("Error loading data:", error);
+        showStatus('Failed to load data: ' + error.message, 'question-status', 'danger');
+        showStatus('Failed to load data: ' + error.message, 'answer-status', 'danger');
+      }
+    }
+
+    // Display status messages
+    function showStatus(message, elementId, type = 'info') {
+      const statusEl = document.getElementById(elementId);
+      if (statusEl) {
+        statusEl.innerHTML = `<div class="alert alert-${type} py-2">${message}</div>`;
+      }
+    }
+
+    function clearStatus(elementId) {
+      const statusEl = document.getElementById(elementId);
+      if (statusEl) {
+        statusEl.innerHTML = '';
+      }
+    }
+
+    // Render functions
+    function renderDoctors(doctors) {
+      // Render doctor list
+      const docList = document.getElementById('doctor-list');
+      docList.innerHTML = '';
+      
+      doctors.forEach(d => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <span>${d.name} <span class="badge bg-secondary">${d.specialty}</span></span>
+          <button class="btn btn-sm btn-danger delete-doctor-btn" data-id="${d.id}">Delete</button>
+        `;
+        docList.appendChild(li);
+      });
+      
+      // Add event listeners
+      document.querySelectorAll('.delete-doctor-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          await deleteItem(`/api/doctors/${id}`);
+        });
+      });
+      
+      // Update doctor select in answer form
+      const docSelect = document.getElementById('answer-doctor');
+      docSelect.innerHTML = '<option value="">Select Doctor</option>';
+      doctors.forEach(d => docSelect.appendChild(new Option(d.name, d.id)));
+    }
+
+    function renderPatients(patients) {
+      // Render patient list
+      const patList = document.getElementById('patient-list');
+      patList.innerHTML = '';
+      
+      patients.forEach(p => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <span>${p.name} <span class="badge bg-info">${p.email}</span></span>
+          <button class="btn btn-sm btn-danger delete-patient-btn" data-id="${p.id}">Delete</button>
+        `;
+        patList.appendChild(li);
+      });
+      
+      // Add event listeners
+      document.querySelectorAll('.delete-patient-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          await deleteItem(`/api/patients/${id}`);
+        });
+      });
+      
+      // Update patient select in question form
+      const patSelect = document.getElementById('question-patient');
+      patSelect.innerHTML = '<option value="">Select Patient</option>';
+      patients.forEach(p => patSelect.appendChild(new Option(p.name, p.id)));
+    }    function renderQuestions(questions) {
+      // Render question list with nested answers
+      const qList = document.getElementById('question-list');
+      qList.innerHTML = '';
+      
+      // Update question select in answer form
+      const qSelect = document.getElementById('answer-question');
+      qSelect.innerHTML = '<option value="">Select Question</option>';
+      
+      // Add all questions to the dropdown
+      questions.forEach(q => {
+        const contentPreview = q.content ? q.content.substring(0, 30) : '';
+        qSelect.appendChild(new Option(
+          `#${q.id}: ${contentPreview}${q.content ? '...' : ''}`, 
+          q.id
+        ));
+      });
+
+      // Render all questions
+      questions.forEach(q => {
+        
+        // Create question card
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+          // Question header
+        let headerBadges = '';
+        if (q.patient && q.patient.name) {
+          headerBadges = `<span class="badge bg-info me-1">Patient: ${q.patient.name}</span>`;
+        } else {
+          headerBadges = `<span class="badge bg-info me-1">Patient: Unknown</span>`;
+        }
+        
+        // Question content
+        card.innerHTML = `
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Question #${q.id}</span>
+            <div>${headerBadges}</div>
+          </div>
+          <div class="card-body">
+            <p class="card-text">${q.content}</p>
+            <div class="attachments-container mb-3"></div>
+            <div class="answers-container"></div>
+          </div>
+        `;        // Question select options are now added in the first loop        // Add question attachments if any
+        console.log(`Rendering Question #${q.id} attachments:`, q.attachments);
+        if (q.attachments && q.attachments.length > 0) {
+          const attContainer = card.querySelector('.attachments-container');
+          attContainer.innerHTML = '<h6>Attachments:</h6>';
+          
+          const attList = document.createElement('div');
+          attList.className = 'list-group list-group-flush';
+          
+          q.attachments.forEach(att => {
+            // Skip attachments without a valid ID
+            if (!att || !att.id) {
+              console.warn('Invalid attachment in question:', att);
+              return;
+            }
+            
+            console.log(`Creating attachment link for Question #${q.id}, attachment ID: ${att.id}, filename: ${att.fileName || 'unnamed'}`);
+            
+            const attItem = document.createElement('a');
+            attItem.href = `/api/attachments/${att.id}/download`;
+            attItem.className = 'list-group-item list-group-item-action';
+            // Use fileName if available, otherwise show the ID
+            const displayName = att.fileName || `Attachment #${att.id}`;
+            attItem.innerHTML = `<i class="bi bi-paperclip"></i> ${displayName}`;
+            attItem.target = '_blank';
+            attList.appendChild(attItem);
+          });
+          
+          // Only add the list if there are valid attachments
+          if (attList.children.length > 0) {
+            console.log(`Adding ${attList.children.length} attachments to Question #${q.id}`);
+            attContainer.appendChild(attList);
+          } else {
+            console.warn(`No valid attachments found for Question #${q.id}`);
+            attContainer.innerHTML = '';
+          }
+        } else {
+          console.log(`Question #${q.id} has no attachments to render`);
+        }
+        
+        // Add answers if any
+        if (q.answers && q.answers.length > 0) {
+          const answersContainer = card.querySelector('.answers-container');
+          answersContainer.innerHTML = '<h6>Answers:</h6>';
+          
+          q.answers.forEach(a => {
+            const answerCard = document.createElement('div');
+            answerCard.className = 'card mb-2 nested-answer';
+              // Answer content
+            let doctorName = a.doctor && a.doctor.name ? a.doctor.name : 'Unknown';            // Make sure to display answer ID correctly
+            const answerId = a.id ? a.id : 'New';
+            
+            answerCard.innerHTML = `
+              <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <span>Answer #${answerId}</span>
+                <span class="badge bg-success">Dr. ${doctorName}</span>
+              </div>
+              <div class="card-body">
+                <p class="card-text">${a.content}</p>
+                <div class="answer-attachments mb-2"></div>
+              </div>
+            `;
+              // Add answer attachments if any
+            if (a.attachments && a.attachments.length > 0) {
+              const attContainer = answerCard.querySelector('.answer-attachments');
+              const attList = document.createElement('div');
+              attList.className = 'list-group list-group-flush mb-2';
+              attList.innerHTML = '<small>Attachments:</small>';
+              
+              a.attachments.forEach(att => {
+                // Skip attachments without a valid ID
+                if (!att || !att.id) {
+                  console.warn('Invalid attachment in answer:', att);
+                  return;
+                }
+                
+                const attItem = document.createElement('a');
+                attItem.href = `/api/attachments/${att.id}/download`;
+                attItem.className = 'list-group-item list-group-item-action py-1';
+                // Use fileName if available, otherwise show the ID
+                const displayName = att.fileName || `Attachment #${att.id}`;
+                attItem.innerHTML = `<small>${displayName}</small>`;
+                attItem.target = '_blank';
+                attList.appendChild(attItem);
+              });
+              
+              // Only add the list if there are valid attachments
+              if (attList.children.length > 0) {
+                attContainer.appendChild(attList);
+              }
+            }answersContainer.appendChild(answerCard);
+          });
+        }
+        
+        qList.appendChild(card);
+      });
+    }    function renderAnswers(answers) {
+      // Render answer list
+      const aList = document.getElementById('answer-list');
+      aList.innerHTML = '';
+      
+      // Debug log for answers data
+      console.log("Rendering answers:", answers);
+      
+      if (!answers || answers.length === 0) {
+        aList.innerHTML = '<div class="alert alert-info">No answers found</div>';
+        return;
+      }
+      
+      answers.forEach(a => {
+        // Skip invalid answers
+        if (!a) {
+          console.warn('Skipping invalid answer in renderAnswers:', a);
+          return;
+        }
+        
+        console.log(`Processing answer with id ${a.id}, content: ${a.content}, doctor: ${a.doctor ? a.doctor.name : 'unknown'}`);
+        
+        // Create answer card
+        const card = document.createElement('div');
+        card.className = 'card mb-3';
+        
+        // Answer header
+        let questionBadge = '';
+        if (a.question && a.question.id) {
+          questionBadge = `<span class="badge bg-info me-1">Question #${a.question.id}</span>`;
+        }
+        
+        let doctorBadge = '';
+        if (a.doctor && a.doctor.name) {
+          doctorBadge = `<span class="badge bg-success">Dr. ${a.doctor.name}</span>`;
+        } else {
+          doctorBadge = `<span class="badge bg-success">Unknown Doctor</span>`;
+        }
+        
+        // Make sure to display answer ID correctly and safely
+        const answerId = a.id ? a.id : 'New';
+        const answerContent = a.content ? a.content : 'No content';
+        
+        card.innerHTML = `
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Answer #${answerId}</span>
+            <div>
+              ${questionBadge}
+              ${doctorBadge}
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-text">${answerContent}</p>
+            <div class="attachments-container"></div>
+          </div>
+        `;// No longer adding to parent answer select dropdown          // Add answer attachments if any
+        if (a.attachments && a.attachments.length > 0) {
+          console.log(`Answer #${a.id} has ${a.attachments.length} attachments`);
+          
+          const attContainer = card.querySelector('.attachments-container');
+          attContainer.innerHTML = '<h6>Attachments:</h6>';
+          
+          const attList = document.createElement('div');
+          attList.className = 'list-group list-group-flush';
+          
+          let validAttachmentCount = 0;
+          
+          a.attachments.forEach(att => {
+            // Skip attachments without a valid ID
+            if (!att || !att.id) {
+              console.warn('Invalid attachment in answer list:', att);
+              return;
+            }
+            
+            console.log(`Adding attachment #${att.id} with filename ${att.fileName || 'unnamed'} to answer #${a.id}`);
+            validAttachmentCount++;
+            
+            const attItem = document.createElement('a');
+            attItem.href = `/api/attachments/${att.id}/download`;
+            attItem.className = 'list-group-item list-group-item-action';
+            // Use fileName if available, otherwise show the ID
+            const displayName = att.fileName || `Attachment #${att.id}`;
+            attItem.innerHTML = `<i class="bi bi-paperclip"></i> ${displayName}`;
+            attItem.target = '_blank';
+            attList.appendChild(attItem);
+          });
+          
+          // Only add the list if there are valid attachments
+          if (validAttachmentCount > 0) {
+            attContainer.appendChild(attList);
+            console.log(`Added ${validAttachmentCount} attachment links to answer #${a.id}`);
+          } else {
+            attContainer.innerHTML = '';
+            console.warn(`No valid attachments found for answer #${a.id} after filtering`);
+          }
+        } else {
+          console.log(`Answer #${a.id} has no attachments`);
+        }
+        
+        aList.appendChild(card);
+      });        // No longer need parent-answer select listener
+    }
+
+    // Delete handler
+    async function deleteItem(url) {
+      try {
+        const response = await fetch(url, { method: 'DELETE' });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Failed to delete: ${response.status}`);
+        }
+        await loadData(); // Reload all data
+      } catch (err) {
+        console.error('Error deleting item:', err);
+        alert('Failed to delete: ' + err.message);
+      }
+    }
+
+    // Form submission handlers
+    document.getElementById('doctor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await fetchJson('/api/doctors', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            name: document.getElementById('doctor-name').value,
+            specialty: document.getElementById('doctor-specialty').value
+          })
+        });
+        e.target.reset();
+        await loadData();
+      } catch (error) {
+        console.error('Error adding doctor:', error);
+        alert('Failed to add doctor: ' + error.message);
+      }
+    });
+
+    document.getElementById('patient-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      try {
+        await fetchJson('/api/patients', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            name: document.getElementById('patient-name').value,
+            email: document.getElementById('patient-email').value
+          })
+        });
+        e.target.reset();
+        await loadData();
+      } catch (error) {
+        console.error('Error adding patient:', error);
+        alert('Failed to add patient: ' + error.message);
+      }
+    });
+
+    document.getElementById('question-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        showStatus('Posting question...', 'question-status', 'info');
+          // Gather form data
+        const content = document.getElementById('question-content').value;
+        const patientId = document.getElementById('question-patient').value;
+        const files = document.getElementById('question-file').files;
+        
+        let attachmentIds = [];
+        
+        // Upload attachments
+        if (files.length > 0) {
+          showStatus('Uploading attachments...', 'question-status', 'info');
+          
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            showStatus(`Uploading file ${i+1}/${files.length}: ${file.name}`, 'question-status', 'info');
+            const attachmentId = await uploadAttachment(file);
+            attachmentIds.push(attachmentId);
+          }
+        }        // Prepare request body
+        const requestBody = {
+          content: content,
+          patientId: patientId,
+          attachmentIds: attachmentIds
+        };
+        
+        // Log attachment IDs for debugging
+        if (attachmentIds.length > 0) {
+          console.log('Question attachment IDs:', attachmentIds);
+        }
+          // Post the question
+        showStatus('Saving question...', 'question-status', 'info');
+        const questionResponse = await fetchJson('/api/questions', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Question created successfully:', questionResponse);
+          showStatus('Question posted successfully!', 'question-status', 'success');
+        e.target.reset();
+        
+        // Reload data
+        await loadData();
+      } catch (error) {
+        console.error('Error posting question:', error);
+        showStatus('Error: ' + (error.message || 'Failed to post question'), 'question-status', 'danger');
+      }
+    });
+
+    document.getElementById('answer-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        showStatus('Submitting answer...', 'answer-status', 'info');
+        
+        // Gather form data
+        const content = document.getElementById('answer-content').value;
+        const questionId = document.getElementById('answer-question').value;
+        const doctorId = document.getElementById('answer-doctor').value;
+        const files = document.getElementById('answer-file').files;
+        
+        let attachmentIds = [];
+        
+        // Upload attachments
+        if (files.length > 0) {
+          showStatus('Uploading attachments...', 'answer-status', 'info');
+          
+          for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            showStatus(`Uploading file ${i+1}/${files.length}: ${file.name}`, 'answer-status', 'info');
+            const attachmentId = await uploadAttachment(file);
+            attachmentIds.push(attachmentId);
+          }
+        }        // Log attachment IDs for debugging
+        if (attachmentIds.length > 0) {
+          console.log('Answer attachment IDs:', attachmentIds);
+        }
+        
+        // Post the answer
+        showStatus('Saving answer...', 'answer-status', 'info');
+        const answerResponse = await fetchJson('/api/answers', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            content: content,
+            questionId: questionId,
+            doctorId: doctorId,
+            attachmentIds: attachmentIds
+          })
+        });
+        
+        console.log('Answer created successfully:', answerResponse);
+        
+        showStatus('Answer submitted successfully!', 'answer-status', 'success');
+        e.target.reset();
+        
+        // Reload data
+        await loadData();
+      } catch (error) {
+        console.error('Error posting answer:', error);
+        showStatus('Error: ' + (error.message || 'Failed to submit answer'), 'answer-status', 'danger');
+      }
+    });
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>
