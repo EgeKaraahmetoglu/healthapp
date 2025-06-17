@@ -1,20 +1,18 @@
 # Health App - Spring Boot REST API
 
-This Spring Boot application provides a comprehensive REST API for a healthcare question and answer system. It allows patients to ask health-related questions, attach relevant files, and receive answers.
-
 ## Features
 
-- Patient management
-- Question and answer system
-- File attachment support
+- Patient and doctor management 
+- Question and answer system 
+- File attachment support 
 - RESTful API endpoints
-- Comprehensive test suite (unit and integration tests)
+- Unit and integration tests
 
 ## Prerequisites
 
 - Java 17 or higher
 - Maven 3.6+
-- PostgreSQL (for production use)
+- PostgreSQL
 - Git
 
 ## Getting Started
@@ -78,14 +76,6 @@ Run with test profile (using H2 in-memory database):
 mvn spring-boot:run -Dspring-boot.run.profiles=test
 ```
 
-## API Documentation
-
-Once the application is running, access the Swagger UI at:
-
-```
-http://localhost:8080/swagger-ui.html
-```
-
 ## Project Structure
 
 - `src/main/java/com/ege/healthapp`: Main application code
@@ -111,3 +101,9 @@ The production configuration uses PostgreSQL and can be customized in `applicati
 ### Testing
 
 The test configuration uses H2 in-memory database and can be found in `application-test.properties`.
+
+To set up the full-stack application:
+1. Clone and run this backend API following the instructions above
+2. Clone and set up the frontend application from its repository
+3. The frontend is configured to communicate with this API at `http://localhost:8080`
+
